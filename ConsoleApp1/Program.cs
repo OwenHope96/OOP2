@@ -10,6 +10,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
+            //Creates testing class if t is entered if not creates a game class
             Console.WriteLine("Press t for tests, to play the game type anything else");
             string Choice = Console.ReadLine();
             if (Choice == "t")
@@ -25,6 +26,8 @@ namespace ConsoleApp1
 
     public class testing
     {
+
+        //Creates a game class that can preform the "tests" method
         public testing()
         {
             Game GameTest = new Game(true);
@@ -58,6 +61,8 @@ namespace ConsoleApp1
 
         public void SetStats(int Number)
         {
+            //Sets the statistics
+
             ChangePath(Number);
             GSHighscore = GetHighScore();
             GSNumberOfPlays = NumberOfPlayes();
@@ -68,6 +73,8 @@ namespace ConsoleApp1
 
         public void RunStats()
         {
+            //Prints the statistics
+
             if (path == "StatTxt.txt")
             {
                 Console.WriteLine("Highscore for player is " + Highscore);
@@ -77,6 +84,8 @@ namespace ConsoleApp1
                 Console.WriteLine("Total number of plays is " + NumberOfPlays);
                 Console.WriteLine();
                 Console.WriteLine("Player scores over 22: ");
+
+                //Uses linq to find specific a range of scores
                 
                 var PrintedItems = from thing in Collumn1
                                    where Convert.ToInt32(thing) > 22
@@ -107,6 +116,8 @@ namespace ConsoleApp1
 
         public void ChangePath(int Number = 1)
         {
+            //Changes the path from one file to the other
+
             if (Number == 0)
             {
                 path = "Stats7.txt";
@@ -118,16 +129,21 @@ namespace ConsoleApp1
 
         public void AddToFile(string Content)
         {
+            //Writes the contents of the string it is given as an argument to a file
+
             File.AppendAllText(path, Content);
         }
 
         public int GetAverage(int Number)
-        
         {
+
             int tally = 0;
             int temp = 1;
             string TempString = "";
             string[] LineArray = File.ReadAllLines(path);
+
+            // takes contents in a file and puts each line as an element in an array
+            // Only records the information if it is the specified collumn. It is specified with the argument "Number"
 
             foreach (string line in LineArray)
             {
@@ -139,19 +155,23 @@ namespace ConsoleApp1
                     {
                         while (Convert.ToString(line[i]) != " ")
                         {
+                            
                             TempString = TempString + line[i];
                             i++;
                             if (i > line.Length - 1)
                             {
+                                //Error handling to stop it from trying to index outside the array
                                 break;
                             }
                             if (Convert.ToString(line[i]) == " ")
                             {
+                                // stops it from recording spaces
                                 break;
                             }
                         }
                         if (Number == 1)
                         {
+                            // Adding to the list for each collumn 
                             Collumn1.Add(TempString);
                         } else if (Number == 2)
                         {
@@ -164,6 +184,7 @@ namespace ConsoleApp1
 
                     if (i > line.Length - 1)
                     {
+                        // error handling
                         break;
                     }
 
@@ -180,6 +201,7 @@ namespace ConsoleApp1
             
             try
             {
+                //If there is nothing in the file it tries dividing by zero. Catches the exception and returns 0 instead.
                 returnval = tally / (LineArray.Length - 1);
             }
             catch (DivideByZeroException)
@@ -221,6 +243,7 @@ namespace ConsoleApp1
 
         public int NumberOfPlayes()
         {
+            // Looks at how many lines are in the file and returns that number substracted by one to get the number of times it has been played
             string[] LineArray = File.ReadAllLines(path);
             NumberOfPlays = (LineArray.Length - 1);
             return NumberOfPlays;
@@ -228,6 +251,8 @@ namespace ConsoleApp1
 
         public int GetHighScore()
         {
+            // scans through array and returns the highest value in the first collumn
+
             int temp = 0;
             string TempString = "";
             string[] LineArray = File.ReadAllLines(path);
@@ -263,12 +288,19 @@ namespace ConsoleApp1
         private int RollValue = 0;
         public SevensOut(bool PBool, bool test = false)
         {
+            //Inherits from AGame
+
             Statistics stats = new Statistics(0);
 
             NumberOfDie = 2;
 
+            //Plays 2 games of Sevens out then record the score in the inherited attributes.
+
             PlayerPoints = RollTime(test);
             EnemyPoints = RollTime(test);
+
+            //Saves the stats in the text file
+
             string StatsThing = Convert.ToString(PlayerPoints) + " " + Convert.ToString(EnemyPoints) + " " + Convert.ToString(NumberOfRolls) + Environment.NewLine;
             stats.AddToFile(StatsThing);
 
@@ -285,29 +317,39 @@ namespace ConsoleApp1
 
         private int RollTime(bool test = false)
         {
+
+            //sevens out game
+            // tally keeps track of total points
+            // subtally is the points gained each spin and what it should add to tally each round
+            // RollNum records how many dice have been rolled for stats
             int tally = 0;
             int RollNum = 0;
             int subtally = 0;
             if (test == false)
             {
                 Console.WriteLine("Roll time");
+                //loops until subtally is 7
                 while (subtally != 7)
                 {
                     subtally = 0;
+                    //rolls both dice
                     subtally = Dice1.RollDie() + Dice2.RollDie();
                     Console.WriteLine(Dice1.GetRoll() + " is roll 1, " + Dice2.GetRoll() + " is roll 2.");
                     RollNum += 2;
                     if (subtally == 7)
                     {
+                        //Stops at 7
                         Console.WriteLine("Rolled 7, will stop rolling");
                     }
                     else if (Dice1.GetRoll() == Dice2.GetRoll())
                     {
+                        //Doubles for doubles
                         Console.WriteLine("Double!");
                         subtally = subtally * 2;
                     }
                     Console.WriteLine("Adding " + subtally);
                     tally += subtally;
+                    //for stats
                     RollValue = subtally;
                 }
                 Console.WriteLine("You got " + tally);
@@ -315,6 +357,7 @@ namespace ConsoleApp1
                 NumberOfRolls += RollNum;
             } else
             {
+                //For testing so you do not have to play the game yourself it does it automatically to run the tests.
                 while (subtally != 7)
                 {
                     subtally = 0;
@@ -364,6 +407,7 @@ namespace ConsoleApp1
         {
             int occurance = 0;
             int tally = 0;
+            //loops through the roll list and keeps track of how many times a number appears and then returns how many points it needs to return
             for (int i = 0; i < 5; i++)
             {
                 for (int j = 0; j < 5; j++)
@@ -408,10 +452,15 @@ namespace ConsoleApp1
         public int GetRoundTotal () { return RoundTotal; }
         private void RollTime(Die Dice3, Die Dice4, Die Dice5, bool test = false)
         {
-
+            //Three or more main code
             Statistics stats = new Statistics();
 
             Console.WriteLine(stats.GetAverage(3));
+
+            //Occurance to keep track of how many times a number occurs in the roll list
+            //turn keeps track of whether it is the players turn or the enemies turn
+            //reroll and reroll counter are both used in tandem to assure that you can not reroll more than once
+            
 
             int occurance = 0;
             int turn = 0;
@@ -427,6 +476,7 @@ namespace ConsoleApp1
             {
                 if (Reroll == false)
                 {
+                    //Rolls all 5 dice
                     RollList[0] = Dice1.RollDie();
                     RollList[1] = Dice2.RollDie();
                     RollList[2] = Dice3.RollDie();
@@ -435,6 +485,7 @@ namespace ConsoleApp1
                     RerollCounter = 0;
                 } else
                 {
+                    //if a reroll is necessary
                     RerollCounter = 1;
                     Reroll = false;
                 }
@@ -448,6 +499,7 @@ namespace ConsoleApp1
                 {
                     for (int j = 0; j < 5; j++)
                     {
+                        // occurance keeps track of how many times the number that occurs the most occurs.
                         if (RollList[i] == RollList[j])
                         {
                             occurance++;
@@ -468,7 +520,7 @@ namespace ConsoleApp1
                         
                         if (VsComputer == false || turn % 2 == 0)
                         {
-
+                            //Gives option to reroll if 2 of the dice are the same.
                             string choice = "";
                             if (test == false)
                             {
@@ -483,10 +535,12 @@ namespace ConsoleApp1
 
                             if (choice == "y")
                             {
+                                // Reroll subroutine
                                 RerollRest(Dice1, Dice2, Dice3, Dice4, Dice5);
                             }
                             else
                             {
+                                //If it doesn't wanna reroll it rerolls all dice.
                                 RollList[0] = Dice1.RollDie();
                                 RollList[1] = Dice2.RollDie();
                                 RollList[2] = Dice3.RollDie();
@@ -516,6 +570,7 @@ namespace ConsoleApp1
                 }
                 else if (turn % 2 == 0)
                 {
+                    //Adds points to the player or the enemy depending on the turn
                     PlayerPoints += tally;
                     RoundTotal = tally;
                     if (test == false)
@@ -546,6 +601,7 @@ namespace ConsoleApp1
             }
             if (test == false)
             {
+                //announces winner
                 if (PlayerPoints > EnemyPoints)
                 {
                     Console.WriteLine("Player wins!");
@@ -556,7 +612,7 @@ namespace ConsoleApp1
                 }
                 Console.ReadLine();
             }
-
+            //adds to stats file
             string StatsThing = Convert.ToString(PlayerPoints) + " " + Convert.ToString(EnemyPoints) + " " + Convert.ToString(turn) + Environment.NewLine;
             stats.AddToFile(StatsThing);
         }
@@ -571,6 +627,9 @@ namespace ConsoleApp1
 
         private void RerollRest(Die Dice1, Die Dice2, Die Dice3, Die Dice4, Die Dice5)
         {
+
+            //Rerolls whichever dice aren't in the 2 dice that are the same
+
             int temp = 0;
             int Occurance = 0;
             for (int i = 0; i < 5; i++)
@@ -589,6 +648,7 @@ namespace ConsoleApp1
                 }
                 Occurance = 0;
             }
+            //records the dice that don't need rerolling's location so that they are not rerolled
             int location1 = 0;
             int location2 = 0;
             for (int i = 0;i < 5;i++)
@@ -607,6 +667,7 @@ namespace ConsoleApp1
             {
                 if (i != location1 && i != location2)
                 {
+                    //places the dice back into the array
                     RollList[i] = SpecificDie(i, Dice1, Dice2, Dice3, Dice4, Dice5);
                 }
             }
@@ -614,6 +675,7 @@ namespace ConsoleApp1
 
         private int SpecificDie(int i, Die Dice1, Die Dice2, Die Dice3, Die Dice4, Die Dice5)
         {
+            // Places the dice into the array after being rerolled
             if (i == 0)
             {
                 return Dice1.RollDie();
@@ -633,6 +695,7 @@ namespace ConsoleApp1
 
         protected override bool GameWin()
         {
+            //Game win function is overrided from the parent class
             if (PlayerPoints >= 20)
             {
                 return true;
@@ -647,6 +710,9 @@ namespace ConsoleApp1
 
     public abstract class AGame
     {
+
+        //Abstract class which is inherited by Sevens out and Three or more classes.
+
         protected int NumberOfDie;
         protected bool VsComputer;
         protected int PlayerPoints;
@@ -668,6 +734,8 @@ namespace ConsoleApp1
     {
         public Game(bool test = false) 
         {
+            //if test is true it runs the tests method.
+            //Creates a menu for running the game or tests.
 
             if (test == true)
             {
@@ -750,6 +818,8 @@ namespace ConsoleApp1
 
         public void tests()
         {
+            //Preforms the tests for the testsing class
+
             SevensOut Game7 = new SevensOut(false, true);
             string LogString = "";
             string TempLogString = "";
@@ -811,6 +881,7 @@ namespace ConsoleApp1
 
     interface IDice 
     {
+        //Interface showing how the die are supposed to be implemented
         int RollDie();
         int GetRoll();
     }
@@ -820,11 +891,13 @@ namespace ConsoleApp1
         private int Value;
         static Random R = new Random();
 
+        //Rolls a random number from 1 to 6
         public int RollDie()
         {
             Value = R.Next(1,7); return Value;
         }
 
+        //returns what the value the dice rolled to is.
         public int GetRoll()
         {
             return Value;
